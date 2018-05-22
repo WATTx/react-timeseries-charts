@@ -280,7 +280,53 @@ export default class EventHandler extends React.Component {
             onMouseDown: this.handleMouseDown,
             onMouseMove: this.handleMouseMove,
             onMouseOut: this.handleMouseOut,
-            onMouseUp: this.handleMouseUp
+            onMouseUp: this.handleMouseUp,
+            onTouchStart: (e) => {
+            },
+    
+            onTouchMove: (e) => {
+        
+                let touch = e.targetTouches[0];
+                if (!touch) return;
+        
+                const x = touch.pageX;
+                const y = touch.pageY;
+        
+                const mockMouseEvent = {
+                preventDefault: () => {},
+                pageX: x,
+                pageY: y
+                };
+        
+                const xy0 = [Math.round(x), Math.round(y)];
+        
+                const begin = this.props.scale.domain()[0].getTime();
+                const end = this.props.scale.domain()[1].getTime();
+        
+                if (!this.state.isPanning) {
+                this.setState({
+                    isPanning: true,
+                    initialPanBegin: begin,
+                    initialPanEnd: end,
+                    initialPanPosition: xy0
+                });
+                }
+        
+                this.handleMouseMove(mockMouseEvent);
+                },
+        
+            onTouchEnd: (e) => {
+                if (this.state.isPanning) {
+                this.setState({
+                    isPanning: false,
+                    initialPanBegin: null,
+                    initialPanEnd: null,
+                    initialPanPosition: null
+                });
+                }
+            }
+        
+            
         };
         return (
             <g pointerEvents="all" {...handlers}>
